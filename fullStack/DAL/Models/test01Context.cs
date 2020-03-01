@@ -18,14 +18,14 @@ namespace fullStack
 
         public virtual DbSet<ApiClaims> ApiClaims { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseMySql("server=192.168.99.100;port=3306;user id=root;password=it404410098;database=test05", x => x.ServerVersion("10.3.22-mariadb"));
-            }
-        }
+//         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+//         {
+//             if (!optionsBuilder.IsConfigured)
+//             {
+// #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+//                 optionsBuilder.UseMySql("server=192.168.99.100;port=3306;user id=root;password=it404410098;database=test05", x => x.ServerVersion("10.3.22-mariadb"));
+//             }
+//         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

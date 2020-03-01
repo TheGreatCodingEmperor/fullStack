@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+
 
 namespace fullStack
 {
@@ -26,13 +28,15 @@ namespace fullStack
             string ConnectionString = Configuration["ConnectionStrings:DefaultConnection"];
             string migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
+            //var applicationUrl = Configuration["ApplicationUrl"].TrimEnd('/');
+
             services.AddDbContext<test01Context>(options =>
             {
                 options.UseMySql(ConnectionString, b => b.MigrationsAssembly(migrationAssembly));
             });
 
-            services.AddControllersWithViews();
-            // In production, the Angular files will be served from this directory
+            services.AddControllers();
+            //In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
@@ -40,12 +44,12 @@ namespace fullStack
 
             services.AddCors();
 
-            services.AddSwaggerGen (c => {
-                c.SwaggerDoc ("v1", new OpenApiInfo { Title = "test01", Version = "v1" });
-                
-            });
+            services.AddControllersWithViews();
 
-            var applicationUrl = Configuration["ApplicationUrl"].TrimEnd ('/');
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,24 +66,19 @@ namespace fullStack
                 app.UseHsts();
             }
 
-            // app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
-            if (!env.IsDevelopment())
-            {
-                app.UseSpaStaticFiles();
-            }
 
             app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                c.DocumentTitle = "Swagger UI - FullStack";
+                c.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "FullStack V1");
             });
 
-            app.UseSpa(spa =>
-            {
+            app.UseSpa(spa => {
                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
                 // see https://go.microsoft.com/fwlink/?linkid=864501
 
@@ -87,14 +86,18 @@ namespace fullStack
 
                 if (env.IsDevelopment())
                 {
-                    spa.UseAngularCliServer(npmScript: "start");
+                    spa.UseAngularCliServer(npmScript: "start"); // IE 11
+                    // spa.UseAngularCliServer (npmScript: "start-es6");
+                    spa.Options.StartupTimeout = TimeSpan.FromSeconds(120); // Increase the timeout if angular app is taking longer to startup
+                    //spa.UseProxyToSpaDevelopmentServer("http://localhost:4200"); // Use this instead to use the angular cli server
                 }
             });
 
-            app.UseSwagger ();
-            app.UseSwaggerUI (c => {
-                c.DocumentTitle = "Swagger UI - UltraApp";
-                c.SwaggerEndpoint ("/swagger/v1/swagger.json", $"nothing V1");
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller}/{action=Index}/{id?}");
             });
         }
     }

@@ -17,10 +17,12 @@ namespace fullStack.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly test01Context _testContext;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, test01Context TestContext)
         {
             _logger = logger;
+            _testContext = TestContext;
         }
 
         [HttpGet]
@@ -34,6 +36,13 @@ namespace fullStack.Controllers
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+        [HttpGet("testDB")]
+        public async Task<IActionResult> TestDB([FromQuery] string test){
+            List<ApiClaims> apiClaims = _testContext.ApiClaims.ToList();
+            await Task.CompletedTask;
+            return Ok(apiClaims);
         }
     }
 }
