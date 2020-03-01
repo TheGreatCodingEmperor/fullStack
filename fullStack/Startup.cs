@@ -34,8 +34,6 @@ namespace fullStack
             {
                 options.UseMySql(ConnectionString, b => b.MigrationsAssembly(migrationAssembly));
             });
-
-            services.AddControllers();
             //In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -78,7 +76,14 @@ namespace fullStack
                 c.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "FullStack V1");
             });
 
-            app.UseSpa(spa => {
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller}/{action=Index}/{id?}");
+            });
+
+             app.UseSpa(spa => {
                 // To learn more about options for serving an Angular SPA from ASP.NET Core,
                 // see https://go.microsoft.com/fwlink/?linkid=864501
 
@@ -91,13 +96,6 @@ namespace fullStack
                     spa.Options.StartupTimeout = TimeSpan.FromSeconds(120); // Increase the timeout if angular app is taking longer to startup
                     //spa.UseProxyToSpaDevelopmentServer("http://localhost:4200"); // Use this instead to use the angular cli server
                 }
-            });
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
             });
         }
     }
